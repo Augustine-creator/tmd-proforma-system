@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
   <title>TMD Kenya - Advanced Proforma System</title>
-  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="dist/output.css">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
   <style>
@@ -273,7 +273,7 @@
       transition: all 0.3s ease;
       cursor: pointer;
       touch-action: manipulation;
-   _weapon
+    }
 
     .vehicle-card:hover {
       transform: translateY(-6px);
@@ -342,6 +342,22 @@
       50% { transform: scale(1.1); }
     }
 
+    .logo-img {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2px solid transparent;
+      background: linear-gradient(45deg, #FFFF00, #87CEEB) border-box;
+    }
+
+    @media (min-width: 640px) {
+      .logo-img {
+        width: 64px;
+        height: 64px;
+      }
+    }
+
     .modal {
       position: fixed;
       top: 0;
@@ -390,9 +406,13 @@
       <!-- Header -->
       <div class="flex items-center justify-center mb-8">
         <div class="logo-animate mr-4">
-          <div class="w-12 h-12 sm:w-16 sm:h-16 rounded-full bg-gradient-to-br from-yellow-400 to-sky-500 flex items-center justify-center neon-border">
-            <span class="text-xl sm:text-2xl font-bold text-black">TMD</span>
-          </div>
+          <img 
+            src="https://drive.google.com/file/d/11WjykjzdrRZeBbi61_mAuqojwKJm4KvY/view?usp=drive_link" 
+            alt="TMD Kenya Logo" 
+            class="logo-img neon-border"
+            onerror="this.src=''; this.alt='TMD Kenya'; this.nextSibling.style.display='block';"
+          >
+          <span style="display: none;" class="text-xl sm:text-2xl font-bold text-black">TMD</span>
         </div>
         <div class="text-center">
           <h1 class="text-3xl sm:text-4xl font-bold neon-text">TMD Kenya</h1>
