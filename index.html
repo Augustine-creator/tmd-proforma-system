@@ -1,0 +1,1107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>TMD Kenya - Advanced Proforma System</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Orbitron:wght@400;700&display=swap');
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: #000000;
+      min-height: 100vh;
+      overflow-x: hidden;
+      touch-action: manipulation;
+    }
+
+    .bg-animated {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -2;
+      background: linear-gradient(135deg, #87CEEB 0%, #000000 100%);
+      overflow: hidden;
+    }
+
+    .particle {
+      position: absolute;
+      background: radial-gradient(circle, rgba(255, 255, 0, 0.5) 0%, transparent 70%);
+      border-radius: 50%;
+      pointer-events: none;
+      animation: float 8s ease-in-out infinite;
+      mix-blend-mode: screen;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0) scale(1); opacity: 0.8; }
+      50% { transform: translateY(-30px) scale(1.2); opacity: 0.4; }
+    }
+
+    .glass {
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(15px) saturate(180%);
+      border-radius: 24px;
+      border: 2px solid #FFFF00;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .glass:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 15px 50px rgba(0, 0, 0, 0.4);
+    }
+
+    .glass-dark {
+      background: rgba(0, 0, 0, 0.4);
+      backdrop-filter: blur(12px);
+      border-radius: 16px;
+      border: 2px solid #87CEEB;
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+    }
+
+    .neon-text {
+      font-family: 'Orbitron', sans-serif;
+      color: #FFFF00;
+      text-shadow: 0 0 10px rgba(255, 255, 0, 0.8), 0 0 20px rgba(135, 206, 235, 0.4);
+      font-weight: 700;
+    }
+
+    .text-bold {
+      color: #FFFFFF;
+      font-weight: 700;
+      text-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+    }
+
+    .neon-border {
+      box-shadow: 0 0 15px rgba(135, 206, 235, 0.6), inset 0 0 10px rgba(255, 255, 0, 0.3);
+      border: 2px solid #87CEEB;
+    }
+
+    .btn-advanced {
+      position: relative;
+      overflow: hidden;
+      background: linear-gradient(45deg, #87CEEB, #FFFF00);
+      border: none;
+      color: #000000;
+      padding: 14px 32px;
+      border-radius: 50px;
+      font-family: 'Orbitron', sans-serif;
+      font-weight: 700;
+      font-size: 16px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      touch-action: manipulation;
+    }
+
+    .btn-advanced::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -150%;
+      width: 150%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+      transition: left 0.4s ease;
+    }
+
+    .btn-advanced:hover::before {
+      left: 150%;
+    }
+
+    .btn-advanced:hover {
+      transform: translateY(-3px) scale(1.02);
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+    }
+
+    .input-advanced {
+      background: rgba(255, 255, 255, 0.1);
+      border: 2px solid #87CEEB;
+      border-radius: 12px;
+      padding: 14px 18px;
+      color: #FFFFFF;
+      font-size: 16px;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      backdrop-filter: blur(10px);
+      width: 100%;
+    }
+
+    .input-advanced::placeholder {
+      color: rgba(255, 255, 255, 0.6);
+    }
+
+    .input-advanced:focus {
+      outline: none;
+      border-color: #FFFF00;
+      box-shadow: 0 0 15px rgba(255, 255, 0, 0.4);
+      background: rgba(255, 255, 255, 0.15);
+    }
+
+    .select-advanced {
+      background: rgba(255, 255, 255, 0.1);
+      border: 2px solid #87CEEB;
+      border-radius: 12px;
+      padding: 14px 18px;
+      color: #FFFFFF;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      backdrop-filter: blur(10px);
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%23FFFFFF'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 1rem center;
+      background-size: 1.2em;
+    }
+
+    .select-advanced:focus {
+      outline: none;
+      border-color: #FFFF00;
+      box-shadow: 0 0 15px rgba(255, 255, 0, 0.4);
+    }
+
+    .loading-spinner {
+      width: 24px;
+      height: 24px;
+      border: 3px solid rgba(255, 255, 255, 0.2);
+      border-top: 3px solid #FFFF00;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .message-slide {
+      transform: translateY(-20px);
+      opacity: 0;
+      animation: slideIn 0.5s ease forwards;
+    }
+
+    @keyframes slideIn {
+      to { transform: translateY(0); opacity: 1; }
+    }
+
+    .error {
+      color: #FF6666;
+      background: rgba(255, 102, 102, 0.1);
+      border: 1px solid rgba(255, 102, 102, 0.2);
+      padding: 12px;
+      border-radius: 10px;
+      margin: 12px 0;
+      font-weight: 600;
+    }
+
+    .success {
+      color: #33FF99;
+      background: rgba(51, 255, 153, 0.1);
+      border: 1px solid rgba(51, 255, 153, 0.2);
+      padding: 12px;
+      border-radius: 10px;
+      margin: 12px 0;
+      font-weight: 600;
+    }
+
+    .fab {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      background: linear-gradient(45deg, #87CEEB, #FFFF00);
+      border: none;
+      color: #000000;
+      font-size: 20px;
+      cursor: pointer;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+      transition: all 0.3s ease;
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .fab:hover {
+      transform: scale(1.15);
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
+    }
+
+    .progress-container {
+      width: 100%;
+      height: 6px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 3px;
+      overflow: hidden;
+      margin-bottom: 24px;
+      border: 1px solid #87CEEB;
+    }
+
+    .progress-bar {
+      height: 100%;
+      background: linear-gradient(90deg, #FFFF00, #87CEEB);
+      border-radius: 3px;
+      transition: width 0.5s ease;
+    }
+
+    .vehicle-card {
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(12px);
+      border-radius: 16px;
+      border: 2px solid #87CEEB;
+      padding: 16px;
+      margin: 12px 0;
+      transition: all 0.3s ease;
+      cursor: pointer;
+      touch-action: manipulation;
+   _weapon
+
+    .vehicle-card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.3);
+      background: rgba(255, 255, 255, 0.15);
+    }
+
+    ::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 3px;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: linear-gradient(45deg, #87CEEB, #FFFF00);
+      border-radius: 3px;
+    }
+
+    @media (max-width: 640px) {
+      .glass {
+        padding: 16px;
+        border-radius: 16px;
+      }
+
+      .btn-advanced {
+        padding: 12px 24px;
+        font-size: 14px;
+      }
+
+      .input-advanced, .select-advanced {
+        padding: 12px 16px;
+        font-size: 14px;
+      }
+
+      .fab {
+        bottom: 16px;
+        right: 16px;
+        width: 48px;
+        height: 48px;
+      }
+
+      .text-4xl {
+        font-size: 1.75rem;
+      }
+
+      .text-2xl {
+        font-size: 1.25rem;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .grid-cols-2 {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .logo-animate {
+      animation: logoPulse 2s ease-in-out infinite;
+    }
+
+    @keyframes logoPulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.1); }
+    }
+
+    .modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.7);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 2000;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+
+    .modal.show {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .modal-content {
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(15px);
+      border-radius: 16px;
+      border: 2px solid #FFFF00;
+      padding: 24px;
+      max-width: 90%;
+      width: 400px;
+      transform: scale(0.8);
+      transition: transform 0.3s ease;
+    }
+
+    .modal.show .modal-content {
+      transform: scale(1);
+    }
+  </style>
+</head>
+<body>
+  <div class="bg-animated"></div>
+  <div id="particles-container"></div>
+  <canvas id="threejs-bg" style="position: fixed; top: 0; left: 0; z-index: -1;"></canvas>
+
+  <div class="min-h-screen flex items-center justify-center p-4 sm:p-6">
+    <div class="glass w-full max-w-4xl p-6 sm:p-8 relative">
+      <!-- Header -->
+      <div class="flex items-center justify-center mb-8">
+        <div class="logo-animate mr-4">
+          <div class="w-12 h-12 sm:w-16 sm:h-16 rounded-full bg-gradient-to-br from-yellow-400 to-sky-500 flex items-center justify-center neon-border">
+            <span class="text-xl sm:text-2xl font-bold text-black">TMD</span>
+          </div>
+        </div>
+        <div class="text-center">
+          <h1 class="text-3xl sm:text-4xl font-bold neon-text">TMD Kenya</h1>
+          <p class="text-lg sm:text-xl text-white/80 font-semibold">Futuristic Proforma System</p>
+        </div>
+      </div>
+
+      <!-- Login Section -->
+      <div id="loginSection" class="glass-dark p-5 sm:p-6 rounded-xl mb-6">
+        <h2 class="text-xl sm:text-2xl font-bold neon-text mb-6 text-center">Secure Access</h2>
+        <div class="space-y-4">
+          <div class="relative">
+            <input 
+              id="loginEmail" 
+              type="email" 
+              class="input-advanced" 
+              placeholder="Enter your email"
+              autocomplete="email"
+            >
+            <div class="absolute inset-y-0 right-0 flex items-center pr-3">
+              <svg class="w-5 h-5 text-white/50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207"></path>
+              </svg>
+            </div>
+          </div>
+          <button id="loginButton" class="btn-advanced w-full text-base sm:text-lg">
+            <span id="loginButtonText">Access System</span>
+            <div id="loginSpinner" class="loading-spinner hidden mx-auto"></div>
+          </button>
+          <div id="loginMessage" class="text-center text-bold"></div>
+        </div>
+      </div>
+
+      <!-- Form Section -->
+      <div id="formSection" class="hidden">
+        <div class="glass-dark p-5 sm:p-6 rounded-xl mb-6">
+          <h2 id="greeting" class="text-xl sm:text-2xl font-bold neon-text mb-6 text-center"></h2>
+          <div id="formMessage" class="mb-4 text-bold"></div>
+          
+          <form id="proformaForm" class="space-y-6">
+            <!-- Personal Information -->
+            <div class="glass p-4 sm:p-5 rounded-lg">
+              <h3 class="text-lg font-bold text-white mb-4">Personal Details</h3>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label class="block text-white/80 mb-2 font-semibold">Full Name</label>
+                  <input id="fullName" type="text" class="input-advanced" placeholder="Enter your full name" required>
+                </div>
+                <div>
+                  <label class="block text-white/80 mb-2 font-semibold">Phone Number</label>
+                  <input id="phoneNumber" type="tel" class="input-advanced" placeholder="+254 712 345 678" required>
+                </div>
+                <div>
+                  <label class="block text-white/80 mb-2 font-semibold">ID Number</label>
+                  <input id="idNumber" type="text" class="input-advanced" placeholder="Enter your ID number" required>
+                </div>
+                <div>
+                  <label class="block text-white/80 mb-2 font-semibold">KRA PIN</label>
+                  <input id="kraPin" type="text" class="input-advanced" placeholder="A123456789Z" required>
+                </div>
+              </div>
+            </div>
+
+            <!-- Banking Information -->
+            <div class="glass p-4 sm:p-5 rounded-lg">
+              <h3 class="text-lg font-bold text-white mb-4">Banking Details</h3>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label class="block text-white/80 mb-2 font-semibold">Bank</label>
+                  <select id="bank" class="select-advanced" required>
+                    <option value="">Select Your Bank</option>
+                    <option value="Ncba Bank">NCBA Bank</option>
+                    <option value="Hfc Bank">HFC Bank</option>
+                    <option value="Absa Bank">Absa Bank</option>
+                    <option value="Lpo">LPO</option>
+                    <option value="Cash">Cash</option>
+                    <option value="Biashara Sacco">Biashara Sacco</option>
+                    <option value="Equity Bank Ltd.">Equity Bank Ltd.</option>
+                    <option value="Sidian Bank">Sidian Bank</option>
+                    <option value="Caritas">Caritas</option>
+                    <option value="Nawiri Sacco">Nawiri Sacco</option>
+                    <option value="Kenya Commercial Bank Ltd.">Kenya Commercial Bank Ltd.</option>
+                    <option value="Co-Operative Bank Of Kenya Ltd.">Co-Operative Bank Of Kenya Ltd.</option>
+                    <option value="Fortune Sacco">Fortune Sacco</option>
+                    <option value="Yetu Dt Sacco Society Ltd">Yetu DT Sacco Society Ltd</option>
+                    <option value="Fariji">Fariji</option>
+                    <option value="Stima Sacco">Stima Sacco</option>
+                    <option value="Barclays Bank Of Kenya Ltd.">Barclays Bank Of Kenya Ltd.</option>
+                    <option value="Standard Chartered Bank (K) Ltd.">Standard Chartered Bank (K) Ltd.</option>
+                    <option value="National Bank Of Kenya Ltd.">National Bank Of Kenya Ltd.</option>
+                    <option value="Diamond Trust Bank (K) Ltd.">Diamond Trust Bank (K) Ltd.</option>
+                    <option value="Cfc Stanbic Bank Ltd.">CFC Stanbic Bank Ltd.</option>
+                    <option value="Gdc Sacco">GDC Sacco</option>
+                    <option value="Kimisitu Dt Sacco">Kimisitu DT Sacco</option>
+                    <option value="Unaitas">Unaitas</option>
+                    <option value="Muungano Microfinance">Muungano Microfinance</option>
+                    <option value="Nic Bank Ltd.">NIC Bank Ltd.</option>
+                    <option value="I & M Bank Ltd.">I & M Bank Ltd.</option>
+                    <option value="Family Bank Ltd.">Family Bank Ltd.</option>
+                    <option value="Bank Of Africa Kenya Ltd.">Bank Of Africa Kenya Ltd.</option>
+                    <option value="Commercial Bank Of Africa Ltd.">Commercial Bank Of Africa Ltd.</option>
+                    <option value="Citibank N.A.">Citibank N.A.</option>
+                    <option value="Ecobank Limited">Ecobank Limited</option>
+                    <option value="Faulu Bank">Faulu Bank</option>
+                    <option value="Postbank">Postbank</option>
+                    <option value="Kingdom Bank">Kingdom Bank</option>
+                    <option value="Gulf African Bank Ltd.">Gulf African Bank Ltd.</option>
+                    <option value="Habib Bank A.G. Zurich">Habib Bank A.G. Zurich</option>
+                    <option value="Habib Bank Ltd.">Habib Bank Ltd.</option>
+                    <option value="Development Bank (K) Ltd.">Development Bank (K) Ltd.</option>
+                    <option value="Prime Bank Ltd.">Prime Bank Ltd.</option>
+                    <option value="Bank Of Baroda (K) Ltd.">Bank Of Baroda (K) Ltd.</option>
+                    <option value="African Banking Corp. Ltd.">African Banking Corp. Ltd.</option>
+                    <option value="Bank Of India">Bank Of India</option>
+                    <option value="Fidelity Commercial Bank Ltd.">Fidelity Commercial Bank Ltd.</option>
+                    <option value="Fina Bank Ltd.">Fina Bank Ltd.</option>
+                    <option value="First Community Bank Ltd.">First Community Bank Ltd.</option>
+                    <option value="Giro Commercial Bank Ltd.">Giro Commercial Bank Ltd.</option>
+                    <option value="Equatorial Commercial Bank Ltd.">Equatorial Commercial Bank Ltd.</option>
+                    <option value="Oriental Bank Ltd.">Oriental Bank Ltd.</option>
+                    <option value="Paramount Universal Bank Ltd.">Paramount Universal Bank Ltd.</option>
+                    <option value="Transnational Bank Ltd.">Transnational Bank Ltd.</option>
+                    <option value="Victoria Commercial Bank Ltd.">Victoria Commercial Bank Ltd.</option>
+                    <option value="Consolidated Bank Of Kenya Ltd.">Consolidated Bank Of Kenya Ltd.</option>
+                    <option value="Credit Bank Ltd.">Credit Bank Ltd.</option>
+                    <option value="Dubai Bank Ltd.">Dubai Bank Ltd.</option>
+                    <option value="Imperial Bank Ltd.">Imperial Bank Ltd.</option>
+                    <option value="Jamii Bora Bank Ltd.">Jamii Bora Bank Ltd.</option>
+                    <option value="K-Rep Bank Ltd.">K-Rep Bank Ltd.</option>
+                    <option value="Kenya Women Microfinance Bank">Kenya Women Microfinance Bank</option>
+                    <option value="Middle East Bank (K) Ltd.">Middle East Bank (K) Ltd.</option>
+                    <option value="Chase Bank (K) Ltd.">Chase Bank (K) Ltd.</option>
+                    <option value="Uba Kenya Bank Ltd.">Uba Kenya Bank Ltd.</option>
+                    <option value="Police Sacco">Police Sacco</option>
+                    <option value="K-Unity">K-Unity</option>
+                    <option value="Tai Sacco">Tai Sacco</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="block text-white/80 mb-2 font-semibold">Bank Branch</label>
+                  <input id="bankBranch" type="text" class="input-advanced" placeholder="Enter branch name" required>
+                </div>
+                <div class="sm:col-span-2">
+                  <label class="block text-white/80 mb-2 font-semibold">Banker Email (Optional)</label>
+                  <input id="bankerEmail" type="email" class="input-advanced" placeholder="banker@bank.com">
+                </div>
+              </div>
+            </div>
+
+            <!-- Vehicle Selection -->
+            <div class="glass p-4 sm:p-5 rounded-lg">
+              <h3 class="text-lg font-bold text-white mb-4">Vehicle Selection</h3>
+              <div class="space-y-4">
+                <div>
+                  <label class="block text-white/80 mb-2 font-semibold">Vehicle Model</label>
+                  <select id="model" class="select-advanced" required>
+                    <option value="">Select Vehicle Model</option>
+                  </select>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label class="block text-white/80 mb-2 font-semibold">Apply Discount</label>
+                    <select id="applyDiscount" class="select-advanced">
+                      <option value="NO">No Discount</option>
+                      <option value="YES">Apply Discount</option>
+                    </select>
+                  </div>
+                  <div id="discountValueSection" class="hidden">
+                    <label class="block text-white/80 mb-2 font-semibold">Discount Value (KES)</label>
+                    <input id="discountValue" type="number" class="input-advanced" placeholder="0" min="0">
+                    <p id="maxDiscountInfo" class="text-sm text-white/80 mt-1 font-semibold"></p>
+                  </div>
+                </div>
+                <div id="pricingDisplay" class="glass p-4 rounded-lg text-center">
+                  <div id="finalPrice" class="text-xl sm:text-2xl font-bold text-white"></div>
+                  <div id="discountAmount" class="text-yellow-300 font-semibold mt-2"></div>
+                  <div id="vehicleDescription" class="text-sm text-white/80 mt-2 font-semibold"></div>
+                </div>
+              </div>
+            </div>
+
+            <button type="submit" id="submitButton" class="btn-advanced w-full text-base sm:text-lg py-4" disabled>
+              <span id="submitButtonText">Submit Proforma</span>
+              <div id="submitSpinner" class="loading-spinner hidden mx-auto"></div>
+            </button>
+          </form>
+        </div>
+      </div>
+
+      <!-- Proforma Section -->
+      <div id="proformaSection" class="hidden">
+        <div class="glass-dark p-5 sm:p-6 rounded-xl">
+          <div class="flex items-center justify-between mb-6">
+            <h2 class="text-xl sm:text-2xl font-bold neon-text">Your Proformas</h2>
+            <button id="viewProformasButton" class="btn-advanced text-sm sm:text-base">
+              <svg class="w-4 h-4 sm:w-5 sm:h-5 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+              </svg>
+              View Proformas
+            </button>
+          </div>
+          <div id="proformaList"></div>
+        </div>
+      </div>
+
+      <!-- Footer -->
+      <div class="text-center text-white/80 mt-8 p-4 glass-dark rounded-lg">
+        <div class="flex items-center justify-center mb-2">
+          <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+          </svg>
+          <span class="font-bold">TMD Kenya</span>
+        </div>
+        <p class="text-sm font-semibold">Kenyatta Highway, Thika, P.O. Box 12667, Nairobi, Kenya</p>
+        <div class="flex items-center justify-center mt-2 space-x-4 flex-wrap">
+          <span class="text-sm font-semibold">📞 0721 726 654</span>
+          <span class="text-sm font-semibold">📞 0800 720 797 (Toll Free)</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Floating Action Button -->
+  <button class="fab" id="scrollToTop">
+    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" class="w-6 h-6">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18"></path>
+    </svg>
+  </button>
+
+  <!-- Discount Request Modal -->
+  <div id="discountModal" class="modal">
+    <div class="modal-content glass">
+      <h3 class="text-lg font-bold neon-text mb-4">Discount Request</h3>
+      <p class="text-white/80 mb-4 font-semibold">The requested discount exceeds the maximum allowed. Please contact the admin to request a special discount.</p>
+      <p class="text-white/80 mb-4 font-semibold">📞 <a href="tel:0714374300" class="text-yellow-300 hover:underline">0714374300</a></p>
+      <p class="text-white/80 mb-4 font-semibold">📧 <a href="mailto:admin@tmdkenya.com" class="text-yellow-300 hover:underline">admin@tmdkenya.com</a></p>
+      <button id="closeModalButton" class="btn-advanced w-full">Close</button>
+    </div>
+  </div>
+
+  <script>
+    // Configuration
+    const API_URL = 'https://script.google.com/macros/s/AKfycbwf-nIVL8QKJOYyqPCGEY9lopUOmTj7ZuWl0G00iqlSSO5z-A8XuVx43HRa67CrxZzB/exec';
+    let sessionId = null;
+    let vehicles = [];
+    let currentStep = 0;
+    const totalSteps = 3;
+    let loggedInEmail = '';
+
+    // Vehicle Data
+    const vehicleData = [
+      { uniqueModel: "E4-NLR CAB CHASSIS-439,000", model: "NLR CAB CHASSIS", highestSP: 3951000, lowestSP: 3512000, maxDiscount: 439000, description: "", active: true },
+      { uniqueModel: "E4-NLR TRUCK BODY ON-439,000", model: "NLR TRUCK BODY ON", highestSP: 4262000, lowestSP: 3823000, maxDiscount: 439000, description: "", active: true },
+      { uniqueModel: "E4-NMR CAB CHASSIS-330,000", model: "NMR CAB CHASSIS", highestSP: 4460000, lowestSP: 4130000, maxDiscount: 330000, description: "", active: true },
+      { uniqueModel: "E4-NMR CAB CHASSIS W/BODY-330,000", model: "NMR CAB CHASSIS W/BODY", highestSP: 4838000, lowestSP: 4508000, maxDiscount: 330000, description: "", active: true },
+      { uniqueModel: "E4-NQR CAB CHASSIS-788,000", model: "NQR CAB CHASSIS", highestSP: 5491000, lowestSP: 4703000, maxDiscount: 788000, description: "", active: true },
+      { uniqueModel: "E4-NQR TRUCK W/BODY-788,000", model: "NQR TRUCK W/BODY", highestSP: 5940000, lowestSP: 5152000, maxDiscount: 788000, description: "", active: true },
+      { uniqueModel: "E4-NQR xtra TRUCK-573,000", model: "NQR xtra TRUCK", highestSP: 5723000, lowestSP: 5150000, maxDiscount: 573000, description: "", active: true },
+      { uniqueModel: "E4-NQR xtra W/BODY-573,000", model: "NQR xtra W/BODY", highestSP: 6261000, lowestSP: 5688000, maxDiscount: 573000, description: "", active: true },
+      { uniqueModel: "E4-NPS TRUCK CKD-596,000", model: "NPS TRUCK CKD", highestSP: 6946000, lowestSP: 6350000, maxDiscount: 596000, description: "", active: true },
+      { uniqueModel: "E2-NPS TRUCK CKD-345,000", model: "NPS TRUCK CKD", highestSP: 6614000, lowestSP: 6269000, maxDiscount: 345000, description: "", active: true },
+      { uniqueModel: "E4-FVR 34P CAB CHASSIS-1,866,000", model: "FVR 34P CAB CHASSIS", highestSP: 11113000, lowestSP: 9247000, maxDiscount: 1866000, description: "ISUZU FVR 34P TRUCK, CAB + CHASSIS; (WITH OPEN HIGHSIDED DOUBLE DROP BODY) ENGINE: 6HK1-TCN, DIESEL 6 CYLINDER, DISPLACEMENT (L): 7,790, TORQUE: 706NM, STEERING OPERATION: POWER, TRANSMISSION: 9 SPEED, FUEL TANK CAPACITY: 200 LTRS, G.V.W- 18,000 T.W-5,130 L.C-12,870.", active: true },
+      { uniqueModel: "E4-ISUZU MUX 3.0L RJ 07-1,913,000", model: "ISUZU MUX 3.0L RJ 07", highestSP: 15423000, lowestSP: 13510000, maxDiscount: 1913000, description: "ISUZU MU-X 1.9L (mu-X RJ05 3.0L); ENGINE: 4JJ3-TCX, NO. OF CYLINDERS: 4 DISPLACEMENT: 2,999CC, TORQUE: 450NM, DRIVE, TRANSMISSION: 4X4, 6-SPEED AUTO, SEATING CAPACITY: 7 SEATER, AIRBAG: 7-DUAL FRONT AIRBAGS (DRIVER+PASSANGER), ROOF RAIL & SIDE AIRBAG, DRIVER KNEE AIRBAG, FUEL TANK CAPACITY: 80 LTRS.", active: true }
+    ];
+
+    // Initialize Three.js background
+    function initThreeJS() {
+      const scene = new THREE.Scene();
+      const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+      const renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('threejs-bg'), alpha: true });
+      renderer.setSize(window.innerWidth, window.innerHeight);
+
+      const geometry = new THREE.TetrahedronGeometry(1, 0);
+      const material = new THREE.MeshBasicMaterial({ 
+        color: 0xFFFF00, 
+        transparent: true, 
+        opacity: 0.15,
+        wireframe: true 
+      });
+
+      const shapes = [];
+      for (let i = 0; i < 30; i++) {
+        const mesh = new THREE.Mesh(geometry, material);
+        mesh.position.set(
+          (Math.random() - 0.5) * 25,
+          (Math.random() - 0.5) * 25,
+          (Math.random() - 0.5) * 25
+        );
+        mesh.rotation.set(
+          Math.random() * Math.PI,
+          Math.random() * Math.PI,
+          Math.random() * Math.PI
+        );
+        scene.add(mesh);
+        shapes.push(mesh);
+      }
+
+      camera.position.z = 10;
+
+      function animate() {
+        requestAnimationFrame(animate);
+        shapes.forEach(shape => {
+          shape.rotation.x += 0.008;
+          shape.rotation.y += 0.008;
+          shape.position.y += Math.sin(Date.now() * 0.001 + shape.position.x) * 0.015;
+        });
+        renderer.render(scene, camera);
+      }
+
+      animate();
+
+      window.addEventListener('resize', () => {
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+      });
+    }
+
+    // Initialize particles
+    function initParticles() {
+      const container = document.getElementById('particles-container');
+      for (let i = 0; i < 60; i++) {
+        const particle = document.createElement('div');
+        particle.className = 'particle';
+        particle.style.left = Math.random() * 100 + '%';
+        particle.style.top = Math.random() * 100 + '%';
+        particle.style.width = Math.random() * 3 + 2 + 'px';
+        particle.style.height = particle.style.width;
+        particle.style.animationDelay = Math.random() * 8 + 's';
+        particle.style.animationDuration = (Math.random() * 5 + 5) + 's';
+        container.appendChild(particle);
+      }
+    }
+
+    // GSAP animations for section transitions
+    function animateSectionTransition(sectionId) {
+      gsap.from(`#${sectionId}`, {
+        opacity: 0,
+        scale: 0.95,
+        y: 100,
+        duration: 1.2,
+        ease: 'power4.out'
+      });
+    }
+
+    // Update progress bar
+    function updateProgress() {
+      const progress = (currentStep / totalSteps) * 100;
+      gsap.to('#progressBar', {
+        width: `${progress}%`,
+        duration: 0.5,
+        ease: 'power2.out'
+      });
+    }
+
+    // Utility Functions
+    function showMessage(elementId, message, isError = false) {
+      const element = document.getElementById(elementId);
+      element.innerHTML = message;
+      element.className = `message-slide ${isError ? 'error' : 'success'} text-bold`;
+      gsap.from(`#${elementId}`, {
+        opacity: 0,
+        y: 20,
+        duration: 0.5,
+        ease: 'power2.out'
+      });
+    }
+
+    function sanitizeInput(input) {
+      return input.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
+                  .replace(/javascript:/gi, '')
+                  .replace(/on\w+=/gi, '');
+    }
+
+    async function apiRequest(endpoint, method, data) {
+      try {
+        const response = await fetch(endpoint, {
+          method: method,
+          headers: { 'Content-Type': 'application/json' },
+          body: data ? JSON.stringify(data) : undefined
+        });
+        return await response.json();
+      } catch (error) {
+        throw new Error('Network error occurred');
+      }
+    }
+
+    function showLoading(buttonId, spinnerId, textId, loadingText) {
+      const button = document.getElementById(buttonId);
+      button.disabled = true;
+      gsap.to(`#${spinnerId}`, { opacity: 1, duration: 0.3 });
+      document.getElementById(spinnerId).classList.remove('hidden');
+      document.getElementById(textId).textContent = loadingText;
+    }
+
+    function hideLoading(buttonId, spinnerId, textId, normalText) {
+      const button = document.getElementById(buttonId);
+      button.disabled = false;
+      gsap.to(`#${spinnerId}`, { opacity: 0, duration: 0.3, onComplete: () => {
+        document.getElementById(spinnerId).classList.add('hidden');
+      }});
+      document.getElementById(textId).textContent = normalText;
+    }
+
+    // Show/Hide Modal
+    function showModal() {
+      const modal = document.getElementById('discountModal');
+      modal.classList.add('show');
+      gsap.to(modal, { opacity: 1, duration: 0.3 });
+      gsap.to('.modal-content', { scale: 1, duration: 0.3, ease: 'power2.out' });
+    }
+
+    function hideModal() {
+      const modal = document.getElementById('discountModal');
+      gsap.to(modal, { opacity: 0, duration: 0.3, onComplete: () => {
+        modal.classList.remove('show');
+      }});
+      gsap.to('.modal-content', { scale: 0.8, duration: 0.3 });
+    }
+
+    // Get time-based greeting
+    function getGreeting(email) {
+      const hour = new Date().getHours();
+      let timeOfDay;
+      if (hour < 12) timeOfDay = 'Morning';
+      else if (hour < 17) timeOfDay = 'Afternoon';
+      else if (hour < 20) timeOfDay = 'Evening';
+      else timeOfDay = 'Night';
+      
+      const name = email.split('@')[0].split('.').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+      return `Good ${timeOfDay}, ${name}! Enjoy a smooth proforma experience.`;
+    }
+
+    // Load vehicle models
+    function loadVehicles() {
+      const modelSelect = document.getElementById('model');
+      modelSelect.innerHTML = '<option value="">Select Vehicle Model</option>';
+      vehicles = vehicleData.filter(v => v.active);
+      vehicles.forEach(vehicle => {
+        const option = document.createElement('option');
+        option.value = vehicle.uniqueModel;
+        option.textContent = vehicle.model;
+        modelSelect.appendChild(option);
+      });
+    }
+
+    // Validate form inputs
+    function validateFormInputs() {
+      const fullName = document.getElementById('fullName').value.trim();
+      const phoneNumber = document.getElementById('phoneNumber').value.trim();
+      const idNumber = document.getElementById('idNumber').value.trim();
+      const kraPin = document.getElementById('kraPin').value.trim();
+      const bank = document.getElementById('bank').value;
+      const bankBranch = document.getElementById('bankBranch').value.trim();
+      const model = document.getElementById('model').value;
+
+      if (!fullName.includes(' ') || fullName.split(' ').length < 2) {
+        showMessage('formMessage', 'Full Name must include at least two names', true);
+        return false;
+      }
+
+      if (!/^07\d{8}$/.test(phoneNumber)) {
+        showMessage('formMessage', 'Phone Number must be 10 digits starting with 07', true);
+        return false;
+      }
+
+      if (idNumber.length !== 8) {
+        showMessage('formMessage', 'ID Number must be 8 characters', true);
+        return false;
+      }
+
+      if (!/^P\d{9}[A-Z]$/i.test(kraPin)) {
+        showMessage('formMessage', 'KRA PIN must start with P and be 11 characters', true);
+        return false;
+      }
+
+      if (!bank) {
+        showMessage('formMessage', 'Please select a bank', true);
+        return false;
+      }
+
+      if (!bankBranch) {
+        showMessage('formMessage', 'Bank Branch is required', true);
+        return false;
+      }
+
+      if (!model) {
+        showMessage('formMessage', 'Please select a vehicle model', true);
+        return false;
+      }
+
+      return true;
+    }
+
+    // Handle discount logic
+    function handleDiscount() {
+      const applyDiscount = document.getElementById('applyDiscount').value;
+      const discountValueSection = document.getElementById('discountValueSection');
+      const discountValueInput = document.getElementById('discountValue');
+      const maxDiscountInfo = document.getElementById('maxDiscountInfo');
+      const finalPriceDisplay = document.getElementById('finalPrice');
+      const discountAmountDisplay = document.getElementById('discountAmount');
+      const vehicleDescriptionDisplay = document.getElementById('vehicleDescription');
+      const model = document.getElementById('model').value;
+      const submitButton = document.getElementById('submitButton');
+
+      if (applyDiscount === 'YES') {
+        discountValueSection.classList.remove('hidden');
+        const selectedVehicle = vehicles.find(v => v.uniqueModel === model);
+        if (selectedVehicle) {
+          maxDiscountInfo.textContent = `Maximum Discount: KES ${selectedVehicle.maxDiscount.toLocaleString()}`;
+          vehicleDescriptionDisplay.textContent = selectedVehicle.description || 'No description available';
+          discountValueInput.addEventListener('input', () => {
+            const discount = parseFloat(discountValueInput.value) || 0;
+            if (discount > selectedVehicle.maxDiscount) {
+              showMessage('formMessage', 'Discount exceeds maximum allowed', true);
+              showModal();
+              submitButton.disabled = true;
+            } else {
+              const finalPrice = selectedVehicle.highestSP - discount;
+              finalPriceDisplay.textContent = `Final Price: KES ${finalPrice.toLocaleString()}`;
+              discountAmountDisplay.textContent = discount > 0 ? `Discount Applied: KES ${discount.toLocaleString()}` : '';
+              submitButton.disabled = false;
+            }
+          });
+        }
+      } else {
+        discountValueSection.classList.add('hidden');
+        const selectedVehicle = vehicles.find(v => v.uniqueModel === model);
+        if (selectedVehicle) {
+          finalPriceDisplay.textContent = `Final Price: KES ${selectedVehicle.highestSP.toLocaleString()}`;
+          discountAmountDisplay.textContent = '';
+          vehicleDescriptionDisplay.textContent = selectedVehicle.description || 'No description available';
+          submitButton.disabled = false;
+        }
+      }
+    }
+
+    // Login Handler
+    document.getElementById('loginButton').addEventListener('click', async () => {
+      const email = sanitizeInput(document.getElementById('loginEmail').value);
+      if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        showMessage('loginMessage', 'Please enter a valid email address', true);
+        return;
+      }
+
+      showLoading('loginButton', 'loginSpinner', 'loginButtonText', 'Authenticating...');
+
+      try {
+        const response = await apiRequest(API_URL, 'POST', {
+          action: 'login',
+          email: email,
+          ip: '192.168.1.1',
+          userAgent: navigator.userAgent
+        });
+
+        if (response.status === 'success') {
+          sessionId = response.sessionId;
+          loggedInEmail = email;
+          showMessage('loginMessage', `✅ Successfully authenticated!`);
+          
+          // Smooth transition
+          gsap.to('#loginSection', {
+            opacity: 0,
+            scale: 0.95,
+            y: -100,
+            duration: 1.2,
+            ease: 'power4.in',
+            onComplete: () => {
+              document.getElementById('loginSection').classList.add('hidden');
+              document.getElementById('formSection').classList.remove('hidden');
+              document.getElementById('proformaSection').classList.remove('hidden');
+              document.getElementById('greeting').textContent = getGreeting(email);
+              animateSectionTransition('formSection');
+              animateSectionTransition('proformaSection');
+              currentStep = 1;
+              updateProgress();
+              loadVehicles();
+            }
+          });
+        } else {
+          showMessage('loginMessage', response.message || 'Authentication failed', true);
+          hideLoading('loginButton', 'loginSpinner', 'loginButtonText', 'Access System');
+        }
+      } catch (error) {
+        showMessage('loginMessage', 'Network error, please try again', true);
+        hideLoading('loginButton', 'loginSpinner', 'loginButtonText', 'Access System');
+      }
+    });
+
+    // Form Submission Handler
+    document.getElementById('proformaForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      if (!validateFormInputs()) return;
+
+      showLoading('submitButton', 'submitSpinner', 'submitButtonText', 'Submitting...');
+
+      const formData = {
+        timestamp: new Date().toISOString(),
+        emailAddress: loggedInEmail,
+        fullName: sanitizeInput(document.getElementById('fullName').value),
+        phoneNumber: sanitizeInput(document.getElementById('phoneNumber').value),
+        idNumber: sanitizeInput(document.getElementById('idNumber').value),
+        kraPin: sanitizeInput(document.getElementById('kraPin').value),
+        bank: document.getElementById('bank').value,
+        bankBranch: sanitizeInput(document.getElementById('bankBranch').value),
+        model: document.getElementById('model').value,
+        applyDiscount: document.getElementById('applyDiscount').value,
+        discountValue: parseFloat(document.getElementById('discountValue').value) || 0,
+        finalSP: parseFloat(document.getElementById('finalPrice').textContent.replace(/[^0-9]/g, '')) || 0,
+        description: document.getElementById('vehicleDescription').textContent,
+        status: 'Pending Approval',
+        bankerEmail: sanitizeInput(document.getElementById('bankerEmail').value) || '',
+        approvalNotes: '',
+        sessionId: sessionId,
+        requestId: `REQ-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+        pdfUrl: '',
+        createdDate: new Date().toISOString().split('T')[0]
+      };
+
+      try {
+        const response = await apiRequest(API_URL, 'POST', {
+          action: 'submitProforma',
+          data: formData
+        });
+
+        if (response.status === 'success') {
+          showMessage('formMessage', 'Proforma request submitted successfully! Status: Pending Approval');
+          document.getElementById('proformaForm').reset();
+          document.getElementById('finalPrice').textContent = '';
+          document.getElementById('discountAmount').textContent = '';
+          document.getElementById('vehicleDescription').textContent = '';
+          document.getElementById('submitButton').disabled = true;
+          currentStep = 2;
+          updateProgress();
+          loadProformas();
+        } else {
+          showMessage('formMessage', response.message || 'Submission failed', true);
+        }
+      } catch (error) {
+        showMessage('formMessage', 'Network error, please try again', true);
+      } finally {
+        hideLoading('submitButton', 'submitSpinner', 'submitButtonText', 'Submit Proforma');
+      }
+    });
+
+    // Load Proformas
+    async function loadProformas() {
+      try {
+        const response = await apiRequest(API_URL, 'POST', {
+          action: 'getProformas',
+          email: loggedInEmail,
+          sessionId: sessionId
+        });
+
+        const proformaList = document.getElementById('proformaList');
+        proformaList.innerHTML = '';
+        if (response.proformas && response.proformas.length > 0) {
+          response.proformas.forEach(proforma => {
+            const card = document.createElement('div');
+            card.className = 'vehicle-card';
+            card.innerHTML = `
+              <div class="flex justify-between items-center">
+                <div>
+                  <h4 class="text-white font-bold">${proforma.model}</h4>
+                  <p class="text-white/80 text-sm font-semibold">Request ID: ${proforma.requestId}</p>
+                  <p class="text-white/80 text-sm font-semibold">Status: ${proforma.status}</p>
+                  <p class="text-white/80 text-sm font-semibold">Final Price: KES ${proforma.finalSP.toLocaleString()}</p>
+                  ${proforma.pdfUrl ? `<a href="${proforma.pdfUrl}" target="_blank" class="text-yellow-300 hover:underline font-semibold">View PDF</a>` : ''}
+                </div>
+                <div class="text-yellow-300">${proforma.status === 'Approved' ? '✅' : proforma.status === 'Rejected' ? '❌' : '⏳'}</div>
+              </div>
+            `;
+            proformaList.appendChild(card);
+          });
+        } else {
+          proformaList.innerHTML = '<p class="text-white/80 text-center font-semibold">No proforma requests found.</p>';
+        }
+      } catch (error) {
+        showMessage('formMessage', 'Failed to load proformas', true);
+      }
+    }
+
+    // Event Listeners
+    document.getElementById('model').addEventListener('change', handleDiscount);
+    document.getElementById('applyDiscount').addEventListener('change', handleDiscount);
+    document.getElementById('viewProformasButton').addEventListener('click', loadProformas);
+    document.getElementById('closeModalButton').addEventListener('click', hideModal);
+    document.getElementById('scrollToTop').addEventListener('click', () => {
+      gsap.to(window, { scrollTo: 0, duration: 0.8, ease: 'power3.out' });
+    });
+
+    window.addEventListener('scroll', () => {
+      const fab = document.getElementById('scrollToTop');
+      if (window.scrollY > 300) {
+        fab.classList.remove('hidden');
+        gsap.to(fab, { opacity: 1, duration: 0.3 });
+      } else {
+        gsap.to(fab, { opacity: 0, duration: 0.3, onComplete: () => fab.classList.add('hidden') });
+      }
+    });
+
+    document.addEventListener('touchstart', function() {}, { passive: true });
+
+    // Initialize
+    initThreeJS();
+    initParticles();
+  </script>
+</body>
+</html>
